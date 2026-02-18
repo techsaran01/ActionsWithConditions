@@ -84,3 +84,13 @@ jobs:
         run: ls
       - name: Deploy
         run: echo "Deploying..."
+
+  report:
+    needs: [lint,deploy]
+    if: failure()  # runs only if any failure happens
+    runs-on: ubuntu-latest
+    steps:
+      - name: Output info
+        run: |
+          echo "something went wrong"
+          echo "${{ github }}"
