@@ -32,9 +32,20 @@ jobs:
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
       - name: Install dependencies
         run: npm ci
+
       - name: Test code
+        id: step-run-test-code
         run: npm run test
+
       - name: Upload test report
+        if: steps.step-run-test-code.outcome == 'failure'  # Outcome can be failure, success, skipped, cancelled
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: test.json
+
+      - name: Skip always
+        if: false
         uses: actions/upload-artifact@v4
         with:
           name: test-report
