@@ -1,0 +1,107 @@
+name: Cache
+on:
+  push:
+    branches:
+      - main
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+
+        # cache action has an ouput of bool "cache-hit" which we can use for future validation
+      - name: Cache dependencies
+        id: cacheId
+        uses: actions/cache@v4
+        with:
+          path: node_mudules
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.cacheId.outputs.cache-hit != 'true' # Skipping this step if cache hit occurs
+        run: npm ci
+
+      - name: Lint code
+        run: npm run lint
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+      - name: Cache dependencies
+        id: cacheId
+        uses: actions/cache@v4
+        with:
+          path: node_mudules
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.cacheId.outputs.cache-hit != 'true' # Skipping this step if cache hit occurs
+        run: npm ci
+
+      - name: Test code
+        id: step-run-test-code
+        run: npm run test
+
+      - name: Upload test report
+        if: failure() && steps.step-run-test-code.outcome == 'failure'  # Outcome can be failure, success, skipped, cancelled
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: test.json
+
+      - name: Skip always
+        if: false
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: test.json
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        id: cacheId
+        uses: actions/cache@v4
+        with:
+          path: node_mudules
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.cacheId.outputs.cache-hit != 'true' # Skipping this step if cache hit occurs
+        run: npm ci
+        
+      - name: Build website
+        id: build-website
+        run: npm run build
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-files
+          path: dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-files
+      - name: Output contents
+        run: ls
+      - name: Deploy
+        run: echo "Deploying..."
+
+  report:
+    needs: [lint,deploy]
+    if: failure()  # runs only if any failure happens
+    runs-on: ubuntu-latest
+    steps:
+      - name: Output info
+        run: |
+          echo "something went wrong"
+          echo "${{ github }}"
