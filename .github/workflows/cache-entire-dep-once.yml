@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         # Skipping this step if cache hit occurs
-        if: steps.cacheId.outputs.cache-hit != 'true'         
+        if: steps.cacheId.outputs.cache-hit == false        
         run: npm ci
 
       - name: Lint code
