@@ -4,6 +4,12 @@ on:
     branches:
       - main
 jobs:
+  JustJob:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        run: echo "Just another parallel job"
+
   lint:
     runs-on: ubuntu-latest
     steps:
