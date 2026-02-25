@@ -12,16 +12,18 @@ jobs:
 
         # cache action has an ouput of bool "cache-hit" which we can use for future validation
       - name: Cache dependencies
-        id: cacheId
+        id: cache-Id
         uses: actions/cache@v4
         with:
           path: node_mudules
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Install dependencies
         # Skipping this step if cache hit occurs
-        if: steps.cacheId.outputs.cache-hit == false        
-        run: npm ci
+      - name: Install dependencies
+        if: steps.cache-Id.outputs.cache-hit != 'true'       
+        run: |
+          echo "Cache hit is: ${{ steps.cache-Id.outputs.cache-hit }}"
+          npm ci
 
       - name: Lint code
         run: npm run lint
@@ -32,16 +34,17 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache dependencies
-        id: cacheId
+        id: cache-Id
         uses: actions/cache@v4
         with:
           path: node_mudules
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies        
-        # Skipping this step if cache hit occurs
-        if: steps.cacheId.outputs.cache-hit != 'true'         
-        run: npm ci
+        if: steps.cache-Id.outputs.cache-hit != 'true'         
+        run: |
+          echo "Cache hit is: ${{ steps.cache-Id.outputs.cache-hit }}"
+          npm ci
 
       - name: Test code
         id: step-run-test-code
@@ -68,16 +71,17 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache dependencies
-        id: cacheId
+        id: cache-Id
         uses: actions/cache@v4
         with:
           path: node_mudules
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
-        # Skipping this step if cache hit occurs
-        if: steps.cacheId.outputs.cache-hit != 'true'         
-        run: npm ci
+        if: steps.cache-Id.outputs.cache-hit != 'true'         
+        run: |
+          echo "Cache hit is: ${{ steps.cache-Id.outputs.cache-hit }}"
+          npm ci
 
       - name: Build website
         id: build-website
