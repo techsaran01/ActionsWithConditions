@@ -21,10 +21,7 @@ jobs:
         # Skipping this step if cache hit occurs
       - name: Install dependencies
         if: steps.cache-Id.outputs.cache-hit != 'true'       
-        run: |
-          echo "Cache hit is: ${{ steps.cache-Id.outputs.cache-hit }}"
-          echo "Cache hit is: ${{ steps.cache-Id.outputs.cache-hit != 'true' }}"
-          npm ci
+        run: npm ci
 
       - name: Lint code
         run: npm run lint
@@ -43,10 +40,7 @@ jobs:
 
       - name: Install dependencies        
         if: steps.cache-Id.outputs.cache-hit != 'true'         
-        run: |
-          echo "Cache hit is: ${{ steps.cache-Id.outputs.cache-hit }}"
-          echo "Cache hit is: ${{ steps.cache-Id.outputs.cache-hit }}"
-          npm ci
+        run: npm ci
 
       - name: Test code
         id: step-run-test-code
@@ -81,10 +75,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.cache-Id.outputs.cache-hit != 'true'         
-        run: |
-          echo "Cache hit is: ${{ steps.cache-Id.outputs.cache-hit }}"
-          echo "Cache hit is: ${{ steps.cache-Id.outputs.cache-hit }}"
-          npm ci
+        run: npm ci
 
       - name: Build website
         id: build-website
