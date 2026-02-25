@@ -93,7 +93,7 @@ jobs:
         run: echo "Deploying..."
 
   report:
-    needs: [lint,deploy]
+    needs: [JustJob,lint,deploy]
     if: failure()  # runs only if any failure happens
     runs-on: ubuntu-latest
     steps:
