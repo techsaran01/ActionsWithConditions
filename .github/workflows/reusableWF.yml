@@ -7,9 +7,20 @@ on:
         required: false
         type: string
         default: dist
+    outputs:
+      result:
+        description: Return  value
+        value: ${{jobs.deploy.outputs.outcome}}
+    secrets:
+      some_secrets:
+        description: Trail secrets
+        required: false
 
 jobs:
   deploy:
+    outputs:
+      outcome: ${{steps.set-result.outputs.step-result}}
+      
     runs-on: ubuntu-latest
     steps:
       - name: Get Artifacts
@@ -19,6 +30,14 @@ jobs:
         
       - name: List files..
         run: ls
-        
+
+      - name: Print secret
+        run: echo "${{secrets.some_secrets}}"
+
+      - name: Set ouput result
+        id: set-result
+        run: echo "::set-output name=step-result::success"
+
+
       - name: Output info
         run: echo "Reusable Deploy ..."

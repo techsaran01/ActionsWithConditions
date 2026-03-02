@@ -98,7 +98,15 @@ jobs:
     uses: ./.github/workflows/reusableWF.yml
     with:
       artifact-name: dist-files
-
+    #secrets:
+    #  some_secrets: ${{ secrets.some-secret-info}}
+  
+  print-result-from-reuable-wf:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pring resuit from reusable wh
+        run: echo "${{needs.deploy.outputs.result}}"
 
   report:
     needs: [lint,deploy]
