@@ -2,7 +2,7 @@ name: Continue-on-error-test
 on:
   push:
     branches:
-      - main
+      - main-skip
 jobs:
   JustJob:
     runs-on: ubuntu-latest

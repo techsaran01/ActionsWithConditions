@@ -2,7 +2,7 @@ name: Practing conditional flows
 on:
   push:
     branches:
-      - main
+      - main-skip
 jobs:
   JustJob:
     runs-on: ubuntu-latest

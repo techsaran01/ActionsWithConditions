@@ -1,28 +1,28 @@
-name: Cache-hit-condition-check-flow
+name: Calling reusable wf
 on:
   push:
     branches:
-      - main-skip
+      - main
 jobs:
+  JustJob:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        run: echo "Just another parallel job"
+
   lint:
     runs-on: ubuntu-latest
     steps:
       - name: Get code
         uses: actions/checkout@v4
-
-        # cache action has an ouput of bool "cache-hit" which we can use for future validation 
       - name: Cache dependencies
-        id: cache-Id
+        id: cache
         uses: actions/cache@v4
         with:
-          path: node_modules
+          path: ~/.npm
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
-
-        # Skipping this step if cache hit occurs
       - name: Install dependencies
-        if: steps.cache-Id.outputs.cache-hit != 'true'       
         run: npm ci
-
       - name: Lint code
         run: npm run lint
   test:
@@ -30,16 +30,13 @@ jobs:
     steps:
       - name: Get code
         uses: actions/checkout@v4
-
       - name: Cache dependencies
-        id: cache-Id
+        id: cache
         uses: actions/cache@v4
         with:
-          path: node_modules
+          path: ~/.npm
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
-
-      - name: Install dependencies        
-        if: steps.cache-Id.outputs.cache-hit != 'true'         
+      - name: Install dependencies
         run: npm ci
 
       - name: Test code
@@ -65,18 +62,14 @@ jobs:
     steps:
       - name: Get code
         uses: actions/checkout@v4
-
       - name: Cache dependencies
-        id: cache-Id
+        id: cache
         uses: actions/cache@v4
         with:
-          path: node_modules
+          path: ~/.npm
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
-
       - name: Install dependencies
-        if: steps.cache-Id.outputs.cache-hit != 'true'         
         run: npm ci
-
       - name: Build website
         id: build-website
         run: npm run build
@@ -85,9 +78,10 @@ jobs:
         with:
           name: dist-files
           path: dist
-
-  deploy:
+          
+  deploy-dummy:
     needs: build
+    if: false  # skipping the job
     runs-on: ubuntu-latest
     steps:
       - name: Get build artifacts
@@ -98,6 +92,11 @@ jobs:
         run: ls
       - name: Deploy
         run: echo "Deploying..."
+
+  deploy:
+    needs: build
+    uses: ./.github/workflows/reusable.yml
+
 
   report:
     needs: [lint,deploy]
